@@ -1,8 +1,11 @@
 package com.example.demo.Repository;
 
-import com.example.demo.Entity.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import com.example.demo.Entity.User;
+
 public interface UserRepository extends MongoRepository<User, String> {
-    User findByUserName(String userName);
+    User findByUsername(String username);
+    // If you want to delete by username, use the following method:
+    void deleteByUsername(String username);
 }

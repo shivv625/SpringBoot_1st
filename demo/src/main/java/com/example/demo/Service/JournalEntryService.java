@@ -3,10 +3,9 @@ package com.example.demo.Service;
 import com.example.demo.Entity.JournalEntry;
 import com.example.demo.Entity.User;
 import com.example.demo.Repository.JournalEntryRepository;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,15 +16,23 @@ public class JournalEntryService {
 
     @Autowired
     private JournalEntryRepository journalEntryRepository;
-    private JournalEntry journalEntry;
+    @Autowired
     private UserService userService;
 
+    @Transactional
     public void saveEntry(JournalEntry journalEntry, String userName){
-        User user = userService.findByUserName(userName);
-        journalEntry.setData(LocalDateTime.now());
-       JournalEntry saved= journalEntryRepository.save(journalEntry);
-       user.getJournalEntries().add(saved);
-       userService.saveEntry(user);
+        try {
+            User user = userService.findByUsername(userName);
+            journalEntry.setDate(LocalDateTime.now());
+            JournalEntry saved= journalEntryRepository.save(journalEntry);
+            user.getJournalEntries().add(saved);
+            userService.saveUser(user);
+        }
+        catch (Exception e){
+            System.out.println(e);
+            throw new RuntimeException("an error occered while saving entry");
+        }
+
     }
 
     public void saveEntry(JournalEntry journalEntry){
@@ -33,19 +40,30 @@ public class JournalEntryService {
     }
 
     public List<JournalEntry> getAll(){
-       return journalEntryRepository.findAll();
+        return journalEntryRepository.findAll();
     }
 
     public Optional<JournalEntry> findById(String id) {
         return journalEntryRepository.findById(id);
     }
 
+    @Transactional
+    public boolean deleteById(String id, String userName){
+        boolean removed = false;
+        try {
+            User user = userService.findByUsername(userName);
+            removed = user.getJournalEntries().removeIf(x -> x.getId().equals(id));
+            if (removed){
+                userService.saveNewUser(user);
+                journalEntryRepository.deleteById(id);
+            }
+        }
+        catch (Exception e){
+            System.out.println(e);
+            throw new RuntimeException("an error occured while deleting", e);
+        }
+        return removed;
 
-    public void deleteById(String id, String userName){
-        User user = userService.findByUserName(userName);
-        user.getJournalEntries().removeIf(x -> x.getId().equals(id));
-        userService.saveEntry(user);
-        journalEntryRepository.deleteById(id);
     }
 
 }
