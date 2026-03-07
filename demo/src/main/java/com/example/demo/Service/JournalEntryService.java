@@ -3,21 +3,26 @@ package com.example.demo.Service;
 import com.example.demo.Entity.JournalEntry;
 import com.example.demo.Entity.User;
 import com.example.demo.Repository.JournalEntryRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class JournalEntryService {
 
     @Autowired
     private JournalEntryRepository journalEntryRepository;
     @Autowired
     private UserService userService;
+
+    private static final Logger logger = LoggerFactory.getLogger(JournalEntryService.class);
 
     @Transactional
     public void saveEntry(JournalEntry journalEntry, String userName){
@@ -27,9 +32,10 @@ public class JournalEntryService {
             JournalEntry saved= journalEntryRepository.save(journalEntry);
             user.getJournalEntries().add(saved);
             userService.saveUser(user);
+            log.info("error occured while saving journal entry");
         }
         catch (Exception e){
-            System.out.println(e);
+            log.info("error occured while saving journal entry");
             throw new RuntimeException("an error occered while saving entry");
         }
 
@@ -54,7 +60,7 @@ public class JournalEntryService {
             User user = userService.findByUsername(userName);
             removed = user.getJournalEntries().removeIf(x -> x.getId().equals(id));
             if (removed){
-                userService.saveNewUser(user);
+                userService.saveUser(user);
                 journalEntryRepository.deleteById(id);
             }
         }

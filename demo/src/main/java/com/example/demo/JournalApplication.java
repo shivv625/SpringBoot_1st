@@ -5,15 +5,20 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.MongoTransactionManager;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-@SpringBootApplication
-@EnableTransactionManagement //done by PlatformTransactionalManager done by MongoTransactionalManger
+@SpringBootApplication(exclude = {
+	org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration.class
+})
+@EnableTransactionManagement
+@EnableMongoRepositories(basePackages = "com.example.demo.Repository")
 public class JournalApplication {
 
 	public static void main(String[] args) {
-
+		// Fix for Java 21 SSL/SNI issue with MongoDB Atlas
+		System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
 		SpringApplication.run(JournalApplication.class, args);
 	}
 

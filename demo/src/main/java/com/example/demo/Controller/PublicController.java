@@ -1,12 +1,9 @@
 package com.example.demo.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.Entity.User;
 import com.example.demo.Service.UserService;
@@ -14,23 +11,29 @@ import com.example.demo.Service.UserService;
 @RestController
 @RequestMapping("/public")
 public class PublicController {
+
     @Autowired
     private UserService userService;
 
-    // Utility endpoint to delete all users (for testing only)
-    @DeleteMapping("/delete-all-users")
-    public String deleteAllUsers() {
-        userService.deleteAll();
-        return "All users deleted.";
-    }
-
     @GetMapping("/health-check")
-    public String healthCheck() {
-        return "OK";
+    public ResponseEntity<String> healthCheck() {
+        return new ResponseEntity<>("OK - Application is running", HttpStatus.OK);
     }
 
     @PostMapping("/create-user")
-    public void createUser(@RequestBody User user) {
-        userService.saveNewUser(user);
+    public ResponseEntity<String> createUser(@RequestBody User user) {
+        boolean saved = userService.saveNewUser(user);
+        if (saved) {
+            return new ResponseEntity<>("User created successfully: " + user.getUsername(), HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>("Failed to create user. Username may already exist.", HttpStatus.CONFLICT);
+        }
+    }
+
+
+    @DeleteMapping("/delete-all-users")
+    public ResponseEntity<String> deleteAllUsers() {
+        userService.deleteAll();
+        return new ResponseEntity<>("All users deleted successfully.", HttpStatus.OK);
     }
 }

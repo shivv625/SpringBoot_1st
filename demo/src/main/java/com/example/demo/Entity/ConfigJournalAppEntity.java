@@ -9,19 +9,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
-@Document(collection = "journal_db")
+@Document(collection = "config_journal_app")
 @Data
 @NoArgsConstructor
-public class JournalEntry {
-
-    @Id
-    private String id;
+public class ConfigJournalAppEntity {
 
     @NonNull
-    private String name;
+    private String key;
+    private String value;
 
-    private String content;
-
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime date;
 }

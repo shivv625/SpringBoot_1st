@@ -31,7 +31,7 @@ public class JournalEntryController {
     @Autowired
     private UserService userService;
 
-    @GetMapping
+    @GetMapping  //for getting the journal entries of a particulat user mentioned in the auth
     public ResponseEntity<?> getAllJournalEntriesOfUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
@@ -40,9 +40,8 @@ public class JournalEntryController {
         if (all != null && !all.isEmpty()) {
             return new ResponseEntity<>(all, HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(new java.util.ArrayList<>(), HttpStatus.OK);
     }
-
 
     @PostMapping
     public ResponseEntity<JournalEntry> creatEntry(@RequestBody JournalEntry myEntry){
@@ -74,7 +73,7 @@ public class JournalEntryController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @DeleteMapping("id/{myId}")
+    @DeleteMapping("/id/{myId}")
     public ResponseEntity<?> DeleteJoutnalEntryByID(@PathVariable String myId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();

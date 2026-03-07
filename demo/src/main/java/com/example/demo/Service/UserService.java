@@ -3,8 +3,8 @@ package com.example.demo.Service;
 import java.util.Arrays;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,40 +12,52 @@ import com.example.demo.Entity.User;
 import com.example.demo.Repository.UserRepository;
 
 @Service
+@Slf4j
 public class UserService {
 
     @Autowired
     private UserRepository userEntryRepository;
 
-    private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    public void saveUser(User user){
+    @Autowired
+    private WeatherService weatherService;
+
+    public void saveUser(User user) {
         userEntryRepository.save(user);
     }
-    public void saveNewUser(User user){
+
+    public boolean saveNewUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(Arrays.asList("USER"));
         userEntryRepository.save(user);
+        return true;
     }
 
-    public void saveNewAdmin(User user){
+    public void saveNewAdmin(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRoles(Arrays.asList("USER","ADMIN"));
+        user.setRoles(Arrays.asList("USER", "ADMIN"));
         userEntryRepository.save(user);
     }
 
-
-    public List<User> getAll(){
+    public List<User> getAll() {
         return userEntryRepository.findAll();
     }
 
-    public void deleteById(String id){
+    public void deleteById(String id) {
         userEntryRepository.deleteById(id);
     }
+
     public void deleteAll() {
         userEntryRepository.deleteAll();
     }
-    public User findByUsername(String username){
-          return userEntryRepository.findByUsername(username);
-      }
+
+    public User findByUsername(String username) {
+        return userEntryRepository.findByUsername(username);
+    }
+
+    public WeatherService getWeatherService() {
+        return weatherService;
+    }
 }

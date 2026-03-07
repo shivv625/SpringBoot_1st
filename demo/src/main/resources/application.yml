@@ -1,12 +1,7 @@
 spring:
-  data:
-    mongodb:
-      uri: mongodb+srv://sibsankar_db_user:Mo8sGwtc94SWdMVm@cluster0.nlxznzv.mongodb.net/journaldb?appName=Cluster0&serverSelectionTimeoutMS=10000&tls=true
-      database: journaldb
-      auto-index-creation: true
-    redis:
-      host: localhost
-      port: 6379
+  profiles:
+    active: prod
+
   mail:
     host: smtp.gmail.com
     port: 587
@@ -18,9 +13,6 @@ spring:
           auth: true
           starttls:
             enable: true
-
-server:
-  port: 8081
 
 weather:
   api:
